@@ -34,9 +34,9 @@
     border-right: 1px solid #c6c6c6;
     border-left: 1px solid #c6c6c6;
 
-    &:hover, &:active {
-      border-right: 1px solid #eeeeee;
-      border-left: 1px solid #eeeeee;
+    &:hover, & .active {
+      border-right: 5px solid #eeeeee;
+      border-left: 5px solid #eeeeee;
     }
   }
 

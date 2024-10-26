@@ -1,13 +1,13 @@
 type EventCallback = (...args: any[]) => any;
 
-class TvTEventGenerator {
+class TvTEventGenerator<Event extends string> {
 	private _events: { [key: string]: EventCallback[] };
 
 	constructor() {
 		this._events = {};
 	}
 
-	on(events: string, fct: EventCallback): this {
+	on(events: Event, fct: EventCallback): this {
 		events.split(", ").forEach((event) => {
 			this._events[event] = this._events[event] || [];
 			this._events[event].push(fct);
@@ -16,7 +16,7 @@ class TvTEventGenerator {
 		return this;
 	}
 
-	off(events?: string, fct?: EventCallback): this {
+	off(events?: Event, fct?: EventCallback): this {
 		if (events === undefined) {
 			this._events = {};
 
@@ -38,7 +38,7 @@ class TvTEventGenerator {
 		return this;
 	}
 
-	emit(event: string, ...args: any[]): any {
+	emit(event: Event, ...args: any[]): any {
 		if (this._events[event] === undefined) {
 			return;
 		}
@@ -57,6 +57,7 @@ class TvTEventGenerator {
 	}
 }
 
-const TvTFlexResizeEvent = new TvTEventGenerator();
+type ResizeEvent = "startResize" | "stopResize" | "resize"
+const TvTFlexResizeEvent = new TvTEventGenerator<StringWithSuggestion<ResizeEvent>>();
 
 export {TvTFlexResizeEvent};
