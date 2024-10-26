@@ -1,5 +1,10 @@
-import React from "react";
+import {TvTFlexResizeSplitter} from "./TvTFlexResize";
 
-const App = () => <div>Hello React App from scratch</div>;
+const App = () => {
+
+	return (
+		<TvTFlexResizeSplitter/>
+	)
+};
 
 export default App

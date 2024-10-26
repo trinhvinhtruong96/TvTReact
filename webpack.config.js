@@ -27,14 +27,78 @@ module.exports = {
                     {
                         loader: "babel-loader",
                         options: {
-                            presets: ["@babel/preset-env", "@babel/preset-react", "@babel/preset-typescript"]
+                            presets: [
+                                "@babel/preset-env",
+                                "@babel/preset-typescript",
+                                [
+                                    '@babel/preset-react',
+                                    {
+                                        runtime: 'automatic', // Enables the new JSX Transform
+                                    },
+                                ]
+                            ]
                         }
                     }
                 ]
             },
             {
+                test: /\.scss$/, // Matches regular .scss files (non-modules)
+                exclude: /\.module\.scss$/, // Exclude .module.scss files from this rule
+                use: ['style-loader', 'css-loader', 'sass-loader']
+            },
+            // {
+            //     test: /\.module\.scss$/,
+            //     use: [
+            //         'style-loader',
+            //         {
+            //             loader: 'css-loader',
+            //             options: {
+            //                 modules: {
+            //                     namedExport: false,
+            //                     localIdentName: '[name]_[local]_[hash:base64:5]'
+            //                 },
+            //             }
+            //         },
+            //         'sass-loader'
+            //     ]
+            // },
+            {
+                test: /\.scss$/,
+                use: [
+                    'style-loader',
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            modules: {
+                                namedExport: false,
+                                localIdentName: '[name]_[local]_[hash:base64:5]'
+                            },
+                        }
+                    },
+                    'sass-loader',
+                ]
+            },
+            {
                 test: /\.css$/,
+                exclude: /\.module\.css$/,
                 use: ["style-loader", "css-loader"]
+            },
+            {
+                test: /\.module.css$/, // Matches module.scss files
+                use: [
+                    'style-loader', // Injects CSS into the DOM
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            modules: {
+                                namedExport: false,
+                                exportLocalsConvention: 'camelCase',
+                                localIdentName: '[name]_[local]_[hash:base64:5]', // Configures CSS Modules
+                            },
+                            importLoaders: 1, // Allows other loaders to process @imported resources
+                        },
+                    },
+                ],
             },
             {
                 test: /\.(png|jpe?g|gif|svg|woff|woff2)$/i,
@@ -51,7 +115,7 @@ module.exports = {
 
     // File extensions to support resolving
     resolve: {
-        extensions: [".ts", ".tsx", ".js"]
+        extensions: ['.js', '.jsx', '.ts', '.tsx', '.scss', "css"],
     },
     plugins: [
         new HtmlWebpackPlugin({
@@ -66,6 +130,6 @@ module.exports = {
         // Enable HMR
         hot: true,
         // Automatically open the browser
-        open: true,
+        open: false,
     },
 };
