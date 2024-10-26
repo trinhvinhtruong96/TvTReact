@@ -1,9 +1,9 @@
-import {TvTFlexResizeSplitter} from "./TvTFlexResize";
+import {TvTReflexResizeCol2} from "./examples/tvtFlexResize";
 
 const App = () => {
 
 	return (
-		<TvTFlexResizeSplitter/>
+		<TvTReflexResizeCol2/>
 	)
 };
 

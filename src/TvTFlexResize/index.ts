@@ -1,6 +1,9 @@
-import TvTFlexResizeSplitter from "./TvTFlexResizeSplitter/TvTFlexResizeSplitter";
-
+import TvTFlexContainer from './TvTFlexContainer'
+import TvTFlexElement from './TvTFlexElement'
+import TvTFlexResizeSplitter from './TvTFlexResizeSplitter'
 
 export {
-	TvTFlexResizeSplitter
+	TvTFlexContainer,
+	TvTFlexElement,
+	TvTFlexResizeSplitter,
 }

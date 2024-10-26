@@ -19,6 +19,7 @@
     //enables compatibility with CommonJS modules
     "esModuleInterop": true,
     "module": "commonjs",
+    "skipLibCheck": true,
     "plugins": [
       {
         "name": "typescript-plugin-css-modules"

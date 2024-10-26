@@ -1,0 +1,43 @@
+.tvtFlexContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-content: stretch;
+  align-items: stretch;
+  height: 100%;
+  width: 100%;
+
+  .tvtFlexElement {
+    overflow: auto;
+    height: 100%;
+    width: 100%;
+  }
+
+  .tvtFlexSplitter {
+    background: #fff;
+    z-index: 1;
+  }
+
+}
+
+.horizontal {
+  flex-direction: column;
+}
+
+.vertical {
+  flex-direction: row;
+
+  .tvtFlexSplitter {
+    height: 100%;
+    width: 2px;
+    cursor: col-resize;
+    border-right: 1px solid #c6c6c6;
+    border-left: 1px solid #c6c6c6;
+
+    &:hover, &:active {
+      border-right: 1px solid #eeeeee;
+      border-left: 1px solid #eeeeee;
+    }
+  }
+
+}
