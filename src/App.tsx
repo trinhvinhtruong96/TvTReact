@@ -1,10 +1,8 @@
-import {TvTReflexResizeCol2} from "./examples/tvtFlexResize";
+import React from "react";
+import { TvTReflexResizeCol2 } from "./examples/tvtFlexResize";
 
 const App = () => {
-
-	return (
-		<TvTReflexResizeCol2/>
-	)
+  return <TvTReflexResizeCol2 />;
 };
 
-export default App
+export default App;

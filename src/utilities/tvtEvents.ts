@@ -1,63 +1,67 @@
-type EventCallback = (...args: any[]) => any;
+type EventCallback<Data = {}> = (data: Data) => any;
 
 class TvTEventGenerator<Event extends string> {
-	private _events: { [key: string]: EventCallback[] };
+  private _events: Record<string, EventCallback[]> = {};
 
-	constructor() {
-		this._events = {};
-	}
+  constructor() {
+    this._events = {};
+  }
 
-	on(events: Event, fct: EventCallback): this {
-		events.split(", ").forEach((event) => {
-			this._events[event] = this._events[event] || [];
-			this._events[event].push(fct);
-		});
+  on<Data>(events: Event, fct: EventCallback<Data>): this {
+    events.split(", ").forEach((event) => {
+      this._events[event] = this._events[event] || [];
+      this._events[event].push(fct);
+    });
 
-		return this;
-	}
+    return this;
+  }
 
-	off(events?: Event, fct?: EventCallback): this {
-		if (events === undefined) {
-			this._events = {};
+  off<Data>(events?: Event, fct?: EventCallback<Data>): this {
+    if (events === undefined) {
+      this._events = {};
 
-			return this;
-		}
+      return this;
+    }
 
-		events.split(" ").forEach((event) => {
-			if (!(event in this._events)) {
-				return;
-			}
+    events.split(" ").forEach((event) => {
+      if (!(event in this._events)) {
+        return;
+      }
 
-			if (fct) {
-				this._events[event] = this._events[event].filter((callback) => callback !== fct);
-			} else {
-				this._events[event] = [];
-			}
-		});
+      if (fct) {
+        this._events[event] = this._events[event].filter(
+          (callback) => callback !== fct,
+        );
+      } else {
+        this._events[event] = [];
+      }
+    });
 
-		return this;
-	}
+    return this;
+  }
 
-	emit(event: Event, ...args: any[]): any {
-		if (this._events[event] === undefined) {
-			return;
-		}
+  emit<Data>(event: Event, data: Data): any {
+    if (this._events[event] === undefined) {
+      return;
+    }
 
-		const tmpArray = this._events[event].slice();
+    const tmpArray = this._events[event].slice();
 
-		for (let i = 0; i < tmpArray.length; ++i) {
-			const result = tmpArray[i].apply(this, args);
+    for (let i = 0; i < tmpArray.length; ++i) {
+      const result = tmpArray[i].call(this, data);
 
-			if (result !== undefined) {
-				return result;
-			}
-		}
+      if (result !== undefined) {
+        return result;
+      }
+    }
 
-		return undefined;
-	}
+    return undefined;
+  }
 }
 
-type ResizeEvent = "startResize" | "stopResize" | "resize"
-const TvTFlexResizeEvent = new TvTEventGenerator<StringWithSuggestion<ResizeEvent>>();
+type ResizeEvent = "startResize" | "stopResize" | "resize";
+const TvTFlexResizeEvent = new TvTEventGenerator<
+  StringWithSuggestion<ResizeEvent>
+>();
 
-export {TvTFlexResizeEvent};
+export { TvTFlexResizeEvent };

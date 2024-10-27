@@ -1,15 +1,21 @@
-import {TvTFlexContainer, TvTFlexElement, TvTFlexResizeSplitter} from "../../TvTFlexResize";
-import styles from "./tvtFlexResize.module.scss"
+import {
+  TvTFlexContainer,
+  TvTFlexElement,
+  TvTFlexResizeSplitter,
+} from "../../TvTFlexResize";
+import styles from "./tvtFlexResize.module.scss";
+import React from "react";
 
 const TvTReflexResizeCol2 = () => {
+  return (
+    <TvTFlexContainer className={styles.container} orientation={"vertical"}>
+      <TvTFlexElement className={styles.leftPanel} />
 
-	return <TvTFlexContainer className={styles.container} orientation={"vertical"}>
-		<TvTFlexElement className={styles.leftPanel}/>
+      <TvTFlexResizeSplitter />
 
-		<TvTFlexResizeSplitter/>
+      <TvTFlexElement className={styles.rightPanel} />
+    </TvTFlexContainer>
+  );
+};
 
-		<TvTFlexElement className={styles.rightPanel}/>
-	</TvTFlexContainer>
-}
-
-export default TvTReflexResizeCol2
+export default TvTReflexResizeCol2;

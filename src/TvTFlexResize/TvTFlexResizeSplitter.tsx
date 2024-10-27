@@ -1,56 +1,79 @@
-import {getStylingProps} from "../utilities/tvtProperties";
-import styles from "./TvTFlexResize.module.scss"
-import {useEffect, useRef, useState} from "react";
-import cN from "classnames"
-import {TvTFlexResizeEvent} from "../utilities/tvtEvents";
+import React, { useEffect, useRef, useState } from "react";
+import { getStylingProps } from "../utilities/tvtProperties";
+import styles from "./TvTFlexResize.module.scss";
+import cN from "classnames";
+import { TvTFlexResizeEvent } from "../utilities/tvtEvents";
 
-const TvTFlexResizeSplitter: React.FC<StyledProps> = (props) => {
-	const ref = useRef<HTMLDivElement>(null)
-	const [active, setActive] = useState(false)
+export type StartResizeData = {
+  index: number;
+  event: React.MouseEvent;
+};
 
-	const className = cN(styles.tvtFlexSplitter, {[styles.active]: active})
+export type ResizeData = {
+  index: number;
+  element: HTMLDivElement | null;
+  event: MouseEvent;
+};
 
-	const handleResizeStart = (event: React.MouseEvent) => {
-		setActive(true)
+export type StopResizeData = {
+  index: number;
+  event: MouseEvent;
+};
 
-		TvTFlexResizeEvent.emit("startResize", {
-			event
-		})
-	}
+const TvTFlexResizeSplitter: React.FC<StyledProps & IndexProps> = (props) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(false);
 
-	useEffect(() => {
-		const handleResizeEnd = (event: MouseEvent) => {
-			setActive(false)
+  const className = cN(styles.tvtFlexSplitter, { [styles.active]: active });
 
-			TvTFlexResizeEvent.emit("stopResize", {
-				event
-			})
-		}
+  const handleResizeStart = (event: React.MouseEvent) => {
+    setActive(true);
 
-		const handleResizing = (event: MouseEvent) => {
-			if (active) {
-				event.stopPropagation()
-				event.preventDefault()
+    TvTFlexResizeEvent.emit<StartResizeData>("startResize", {
+      index: props.index,
+      event,
+    });
+  };
 
-				TvTFlexResizeEvent.emit("resize", {
-					element: ref.current,
-					event
-				})
-			}
-		}
+  useEffect(() => {
+    const handleResizeEnd = (event: MouseEvent) => {
+      setActive(false);
 
-		document.addEventListener('mouseup', handleResizeEnd)
-		document.addEventListener('mousemove', handleResizing)
+      TvTFlexResizeEvent.emit<StopResizeData>("stopResize", {
+        index: props.index,
+        event,
+      });
+    };
 
-		return () => {
-			document.removeEventListener('mouseup', handleResizeEnd)
-			document.removeEventListener('mousemove', handleResizing)
-		}
-	}, [])
+    const handleResizing = (event: MouseEvent) => {
+      if (active) {
+        event.stopPropagation();
+        event.preventDefault();
 
-	return (
-		<div ref={ref} onMouseDown={handleResizeStart} {...getStylingProps(props, className)} />
-	)
-}
+        TvTFlexResizeEvent.emit<ResizeData>("resize", {
+          index: props.index,
+          element: ref.current,
+          event,
+        });
+      }
+    };
 
-export default TvTFlexResizeSplitter
+    document.addEventListener("mouseup", handleResizeEnd);
+    document.addEventListener("mousemove", handleResizing);
+
+    return () => {
+      document.removeEventListener("mouseup", handleResizeEnd);
+      document.removeEventListener("mousemove", handleResizing);
+    };
+  }, [active, props.index]);
+
+  return (
+    <div
+      ref={ref}
+      onMouseDown={handleResizeStart}
+      {...getStylingProps(props, className)}
+    />
+  );
+};
+
+export default TvTFlexResizeSplitter;
