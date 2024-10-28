@@ -18,8 +18,11 @@
     "outDir": "./dist",
     //enables compatibility with CommonJS modules
     "esModuleInterop": true,
-    "module": "commonjs",
     "skipLibCheck": true,
+    "verbatimModuleSyntax": true,
+    "noUncheckedIndexedAccess": true,
+    "moduleDetection": "force",
+    "module": "NodeNext",
     "plugins": [
       {
         "name": "typescript-plugin-css-modules"
