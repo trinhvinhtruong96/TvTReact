@@ -6,7 +6,8 @@ type TvTFlexElementProps = {
   flexGrow?: number;
   innerRef?: React.Ref<HTMLElement>;
 } & ParentProps &
-  StyledProps;
+  StyledProps &
+  IndexProps;
 
 const TvTFlexElement: React.FC<TvTFlexElementProps> = (props) => {
   const { children } = props;
@@ -16,7 +17,7 @@ const TvTFlexElement: React.FC<TvTFlexElementProps> = (props) => {
       {...getStylingProps(props, styles.tvtFlexElement, {
         flexShrink: 1,
         flexBasis: "0%",
-        flexGrow: props.flexGrow ?? 1,
+        flexGrow: props.flexGrow,
       })}
     >
       {children}

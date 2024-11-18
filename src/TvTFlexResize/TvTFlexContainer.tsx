@@ -1,5 +1,5 @@
 import styles from "./TvTFlexResize.module.scss";
-import {getStylingProps } from "../utilities/tvtProperties";
+import { getStylingProps } from "../utilities/tvtProperties";
 import cN from "classnames";
 import React, {
   Children,
@@ -10,7 +10,7 @@ import React, {
   useState,
 } from "react";
 import { TvTFlexResizeEvent } from "../utilities/tvtEvents";
-import { ResizeData, StartResizeData } from "./TvTFlexResizeSplitter";
+import type { ResizeData, StartResizeData } from "./TvTFlexResizeSplitter";
 
 type TvTFlexContainerProps = {
   orientation?: "horizontal" | "vertical";
@@ -23,24 +23,50 @@ const TvTFlexContainer: React.FC<
 
   const className = cN(styles.tvtFlexContainer, styles[orientation]);
 
-  const [flexResizeData, setFlexResizeData] = useState();
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const [flexResizeData, setFlexResizeData] = useState<
+    {
+      grow: number;
+    }[]
+  >([]);
 
   const pointerPreviousPositionRef = useRef<number>();
 
+  const getValidChildren = () => {
+    return Children.toArray(children).filter((child) => child);
+  };
+
+  const computeFlexForPixel = () => {
+    if (props.orientation === "vertical") {
+      return 1.0 / containerRef.current.offsetWidth;
+    }
+  };
+
+  useEffect(() => {
+    const validChildren = getValidChildren();
+    const pixelFlex = computeFlexForPixel();
+
+    return () => {
+      TvTFlexResizeEvent.off();
+    };
+  }, []);
+
   useEffect(() => {
     const getPointerAvailablePositionOffset = (
-      positionByOrientation: number,
+      pointerPositionByOrientation: number,
       domElement,
     ) => {
       const { left, right } = domElement.getBoundingClientRect();
       if (orientation === "vertical") {
         const offset =
-          positionByOrientation - pointerPreviousPositionRef.current;
+          pointerPositionByOrientation - pointerPreviousPositionRef.current;
 
-        if (
-          offset < 0 &&
-          (positionByOrientation > left || positionByOrientation < right)
-        ) {
+        if (offset > 0 && pointerPositionByOrientation > left) {
+          return offset;
+        }
+
+        if (offset < 0 && pointerPositionByOrientation < right) {
           return offset;
         }
       }
@@ -51,41 +77,50 @@ const TvTFlexContainer: React.FC<
       const triggerEvent = data.event;
 
       if (props.orientation === "vertical") {
-        document.body.style.cursor = "col-resize";
-        pointerPreviousPositionRef.current = triggerEvent.clientY;
+        document.body.classList.add("col-resize");
+        pointerPreviousPositionRef.current = triggerEvent.clientX;
       }
     });
 
     TvTFlexResizeEvent.on<ResizeData>("resize", (data) => {
       const triggerEvent = data.event;
+      const triggerSplitterElement = data.element;
 
       const offset = getPointerAvailablePositionOffset(
         props.orientation === "vertical"
-          ? triggerEvent.clientY
-          : triggerEvent.clientX,
-        data.element,
+          ? triggerEvent.clientX
+          : triggerEvent.clientY,
+        triggerSplitterElement,
       );
-      console.log("=>(TvTFlexContainer.tsx:68) offset", offset);
 
       if (props.orientation === "vertical") {
-        pointerPreviousPositionRef.current = triggerEvent.clientY;
+        pointerPreviousPositionRef.current = triggerEvent.clientX;
+      }
+
+      if (offset) {
+        const stretchElementIndex =
+          offset > 0 ? data.index + 1 : data.index - 1;
+        const shrinkElementIndex = offset > 0 ? data.index - 1 : data.index + 1;
+
+        const stretchElement = children[stretchElementIndex];
+        const shrinkElement = children[shrinkElementIndex];
       }
     });
 
-    TvTFlexResizeEvent.on<StartResizeData>("stopResize", (data) => {});
-
-    return () => {
-      TvTFlexResizeEvent.off();
-    };
-  }, [orientation, props.orientation]);
+    TvTFlexResizeEvent.on<StartResizeData>("stopResize", (data) => {
+      document.body.classList.remove("col-resize");
+      document.body.classList.remove("row-resize");
+    });
+  }, [children, orientation, props.orientation]);
 
   const renderChildren = () => {
-    const validChildren = Children.toArray(children).filter((child) => child);
+    const validChildren = getValidChildren();
 
     return Children.map(validChildren, (child, index) => {
       if (isValidElement(child)) {
         const newProps = {
           ...child.props,
+          flexGrow: flexResizeData[index].grow,
           index,
         };
         return cloneElement(child, newProps);
@@ -95,7 +130,11 @@ const TvTFlexContainer: React.FC<
     });
   };
 
-  return <div {...getStylingProps(props, className)}>{renderChildren()}</div>;
+  return (
+    <div {...getStylingProps(props, className)} ref={containerRef}>
+      {renderChildren()}
+    </div>
+  );
 };
 
 export default TvTFlexContainer;

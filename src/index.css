@@ -3,3 +3,11 @@
     margin: 0;
     box-sizing: border-box;
 }
+
+.col-resize {
+    cursor: col-resize;
+}
+
+.row-resize {
+    cursor: row-resize;
+}
